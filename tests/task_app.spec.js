@@ -1,13 +1,13 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
 
-describe('Note app', () => {
+describe('Task app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('http://localhost:3001/api/testing/reset')
     await request.post('http://localhost:3001/api/users', {
       data: {
-        name: 'Matti Luukkainen',
-        username: 'mluukkai',
-        password: 'salainen'
+        name: 'Superuser',
+        username: 'root',
+        password: 'tigers'
       }
     })
 
@@ -15,44 +15,44 @@ describe('Note app', () => {
   })
 
   test('front page can be opened', async ({ page }) => {
-    const locator = page.getByText('Notes')
+    const locator = page.getByText('Tasks')
     await expect(locator).toBeVisible()
     await expect(
       page.getByText(
-        'Note app, Department of Computer Science, University of Helsinki 2025'
+        'Task app, Department of Computer Science, University of the Pacific 2025'
       )
     ).toBeVisible()
   })
 
   test('user can log in', async ({ page }) => {
     await page.getByRole('button', { name: 'login' }).click()
-    await page.getByLabel('username').fill('mluukkai')
-    await page.getByLabel('password').fill('salainen')
+    await page.getByLabel('username').fill('root')
+    await page.getByLabel('password').fill('tigers')
 
     await page.getByRole('button', { name: 'login' }).click()
 
-    await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+    await expect(page.getByText('Superuser logged in')).toBeVisible()
   })
 
   describe('when logged in', () => {
     beforeEach(async ({ page }) => {
       await page.getByRole('button', { name: 'login' }).click()
-      await page.getByLabel('username').fill('mluukkai')
-      await page.getByLabel('password').fill('salainen')
+      await page.getByLabel('username').fill('root')
+      await page.getByLabel('password').fill('tigers')
       await page.getByRole('button', { name: 'login' }).click()
     })
 
-    test('a new note can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'new note' }).click()
-      await page.getByRole('textbox').fill('a note created by playwright')
+    test('a new task can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'new task' }).click()
+      await page.getByRole('textbox').fill('a task created by playwright')
       await page.getByRole('button', { name: 'save' }).click()
-      await expect(page.getByText('a note created by playwright')).toBeVisible()
+      await expect(page.getByText('a task created by playwright')).toBeVisible()
     })
 
-    describe('and a note exists', () => {
+    describe('and a task exists', () => {
       beforeEach(async ({ page }) => {
-        await page.getByRole('button', { name: 'new note' }).click()
-        await page.getByRole('textbox').fill('another note by playwright')
+        await page.getByRole('button', { name: 'new task' }).click()
+        await page.getByRole('textbox').fill('another task by playwright')
         await page.getByRole('button', { name: 'save' }).click()
       })
 
