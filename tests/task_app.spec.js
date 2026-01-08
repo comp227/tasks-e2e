@@ -1,14 +1,14 @@
 const { test, describe, expect, beforeEach } = require('@playwright/test')
-const { loginWith, createNote } = require('./helper')
+const { loginWith, createTask } = require('./helper')
 
-describe('Note app', () => {
+describe('Task app', () => {
   beforeEach(async ({ page, request }) => {
     await request.post('/api/testing/reset')
     await request.post('/api/users', {
       data: {
-        name: 'Matti Luukkainen',
-        username: 'mluukkai',
-        password: 'salainen'
+        name: 'Pacific Tests',
+        username: 'test',
+        password: 'pacific'
       }
     })
 
@@ -16,44 +16,44 @@ describe('Note app', () => {
   })
 
   test('front page can be opened', async ({ page }) => {
-    const locator = page.getByText('Notes')
+    const locator = page.getByText('Tasks')
     await expect(locator).toBeVisible()
     await expect(
       page.getByText(
-        'Note app, Department of Computer Science, University of Helsinki 2025'
+        'Task app, Department of Computer Science, University of the Pacific 2025'
       )
     ).toBeVisible()
   })
 
   test('user can log in', async ({ page }) => {
-    await loginWith(page, 'mluukkai', 'salainen')
-    await expect(page.getByText('Matti Luukkainen logged in')).toBeVisible()
+    await loginWith(page, 'test', 'pacific')
+    await expect(page.getByText('Pacific Tests logged in')).toBeVisible()
   })
 
   test('login fails with wrong password', async ({ page }) => {
-    await loginWith(page, 'mluukkai', 'wrong')
+    await loginWith(page, 'test', 'wrong')
 
     const errorDiv = page.locator('.error')
     await expect(errorDiv).toContainText('wrong credentials')
     await expect(errorDiv).toHaveCSS('border-style', 'solid')
     await expect(errorDiv).toHaveCSS('color', 'rgb(255, 0, 0)')
 
-    await expect(page.getByText('Matti Luukkainen logged in')).not.toBeVisible()
+    await expect(page.getByText('Pacific Tests logged in')).not.toBeVisible()
   })
 
   describe('when logged in', () => {
     beforeEach(async ({ page }) => {
-      await loginWith(page, 'mluukkai', 'salainen')
+      await loginWith(page, 'test', 'pacific')
     })
 
-    test('a new note can be created', async ({ page }) => {
-      await createNote(page, 'a note created by playwright')
-      await expect(page.getByText('a note created by playwright')).toBeVisible()
+    test('a new task can be created', async ({ page }) => {
+      await createTask(page, 'a task created by playwright')
+      await expect(page.getByText('a task created by playwright')).toBeVisible()
     })
 
-    describe('and a note exists', () => {
+    describe('and a task exists', () => {
       beforeEach(async ({ page }) => {
-        await createNote(page, 'another note by playwright')
+        await createTask(page, 'another task by playwright')
       })
 
       test('importance can be changed', async ({ page }) => {
